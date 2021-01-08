@@ -6,16 +6,16 @@ from src.grid import Grid
 class Game(object):
     '''Game instance'''
 
-    def __init__(self, screen, grid, fullGrid, difficulty="normal"):
+    def __init__(self, screen, difficulty="normal"):
         self.difficulty = difficulty
         self.screen = screen
-        self.grid = Grid(grid, fullGrid)
-        self.solved = False # Bool indicate if solver was used
+        self.grid = Grid(self.screen)
+        self.solved = False  # Bool indicate if solver was used
 
     # Checks all user inputs and colors values
     def check_user_input(self):
         for cell in self.grid.cells:
-            if cell.state["user_input"] == True:
+            if cell.state["user_input"]:
                 if cell.value == cell.final_val:
                     cell.confirm(self.screen, True)
                 else:
