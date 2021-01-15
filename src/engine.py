@@ -4,8 +4,10 @@ import random
 
 import pygame
 
+from src.button import Button
 from src.checkbox import Checkbox
 from src.game import Game
+from src.icon import Icon
 from src.reader import Reader
 
 
@@ -24,10 +26,13 @@ class Engine(object):
         self.min = 0  # frames counter, resets every min
         # Buttons
         self.buttons = {
-            "new_game": ["New Game", pygame.Rect((485, 10), (100, 50))],
-            "solve": ["Solve", pygame.Rect((485, 110), (100, 50))],
-            "check": ["Check", pygame.Rect((485, 210), (100, 50))],
-            "hint": ["Hint", pygame.Rect((485, 310), (100, 50))]
+            "new_game": Button('./imgs/newgame_button.png', (390, 10), self.screen),
+            "solve": Button('./imgs/solve_button.png', (390, 110), self.screen),
+            "check": Button('./imgs/check_button.png', (390, 210), self.screen),
+            "hint": Button('./imgs/hint_button.png', (390, 310), self.screen)
+        }
+        self.icons = {
+            "easy": Icon('./imgs/easy_icon.png', (580, 10), self.screen),
         }
         self.click_sound = pygame.mixer.Sound('./sounds/click.wav')
         # Bottom text
@@ -58,17 +63,17 @@ class Engine(object):
     def start(self):
 
         # Creates and draw checkboxes
-        self.add_checkbox(self.screen, 600, 10, color=(230, 230, 230), caption="easy",
+        self.add_checkbox(self.screen, 550, 10, color=(230, 230, 230), caption="",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
 
-        self.add_checkbox(self.screen, 600, 30, color=(230, 230, 230), caption="normal",
+        self.add_checkbox(self.screen, 550, 30, color=(230, 230, 230), caption="",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
 
-        self.add_checkbox(self.screen, 600, 50, color=(230, 230, 230), caption="hard",
+        self.add_checkbox(self.screen, 550, 50, color=(230, 230, 230), caption="",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
@@ -77,22 +82,27 @@ class Engine(object):
             box._draw_button_text()
 
         # Draw buttons
-        for val in self.buttons.values():
-            self.button_draw(val[0], val[1])
+        self.button_draw()
+
+
 
         # Starts main loop
         self.run = True
         self.main_loop()
 
-    def button_draw(self, text, rect):
-        pygame.draw.rect(self.screen, (0, 0, 0), rect, 3)
-        content = self.font.render(text, True, [40, 40, 40])
-        rect = content.get_rect(center=rect.center)
-        self.screen.blit(content, rect)
+    def button_draw(self):
+        for name, button in self.buttons.items():
+            button.draw()
+
+    def icon_draw(self):
+        for name, icon in self.icons.items():
+            icon.draw()
 
     # Update screen
     def draw(self):
         self.game.grid.draw()
+        self.button_draw()
+        self.icon_draw()
         for box in self.boxes:
             box.render_checkbox()
         pygame.display.update()
@@ -102,11 +112,20 @@ class Engine(object):
             pygame.time.delay(16)
             self.counter += 1
             for event in pygame.event.get():
+                pos = pygame.mouse.get_pos()
                 # Quitting events
                 if event.type == pygame.QUIT:
                     self.save_state()
                     self.run = False
                     pygame.quit()
+
+
+
+                #hovering
+                #if self.button_test.isTouching(pos):
+                 #   print("touching")
+                    #self.button_test.image = pygame.transform.scale(self.button_test.image, (math.floor(self.button_test.image.get_width() * 1.1), math.floor(self.button_test.image.get_height() * 1.1)))
+
                 # Click events
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     print('clicking')
@@ -119,17 +138,16 @@ class Engine(object):
                         if box.checked:
                             self.checked_box = box
 
-                    pos = pygame.mouse.get_pos()
 
                     # Solve Button clicked
-                    if self.buttons["solve"][1].collidepoint(pos):
+                    if self.buttons["solve"].is_touching(pos):
                         print('solving')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.grid.solve_grid()
                         self.game.solved = True
 
                     # New game Button clicked
-                    if self.buttons["new_game"][1].collidepoint(pos):
+                    if self.buttons["new_game"].is_touching(pos):
                         diff = "normal"
                         pygame.mixer.Sound.play(self.click_sound)
                         if self.checked_box:
@@ -138,13 +156,13 @@ class Engine(object):
                         self.new_game(diff)
 
                     # Check Button clicked
-                    if self.buttons["check"][1].collidepoint(pos):
+                    if self.buttons["check"].is_touching(pos):
                         print('checking')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.check_user_input()
 
                     # hint Button clicked
-                    if self.buttons["hint"][1].collidepoint(pos) and self.game.grid.check_grid() == False:
+                    if self.buttons["hint"].is_touching(pos) and self.game.grid.check_grid() == False:
                         print('hinting')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.give_hint(self.screen)

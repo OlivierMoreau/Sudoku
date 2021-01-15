@@ -1,12 +1,12 @@
 import pygame
 
 
-class Button:
+class Icon:
 
     def __init__(self, img, coordinate, screen):
         self.image = pygame.image.load(img).convert_alpha()
         self.coordinate = coordinate
-        self.image = pygame.transform.scale(self.image, (150, 50))
+        self.image = pygame.transform.scale(self.image, (25, 25))
         self.rect = self.image.get_rect(topleft=self.coordinate)
         self.mask = pygame.mask.from_surface(self.image)
         self.screen = screen
@@ -14,7 +14,3 @@ class Button:
     def draw(self):
         self.screen.blit(self.image, self.rect)
 
-    def isTouching(self, pos):
-        pos_in_mask = pos[0] - self.rect.x, pos[1] - self.rect.y
-        touching = self.rect.collidepoint(pos) and self.mask.get_at(pos_in_mask)
-        return touching

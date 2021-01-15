@@ -31,6 +31,8 @@ class Grid(object):
 
         self.rect = pygame.Rect((10,10), (370, 370))
 
+        self.grey = (40,40,40)
+
         self.make_grid_struct()
 
         self.set_vals()
@@ -119,11 +121,11 @@ class Grid(object):
     # Draw grid and cells borders
     def draw(self):
             grid_rect = pygame.Rect((10,10),(360, 360))
-            pygame.draw.rect(self.screen, (0,0,0), grid_rect, 5)
-            pygame.draw.line(self.screen, (0,0,0), (10, 130), (370, 130), 3)
-            pygame.draw.line(self.screen, (0,0,0), (10, 250), (370, 250), 3)
-            pygame.draw.line(self.screen, (0,0,0), (130, 10), (130, 370), 3)
-            pygame.draw.line(self.screen, (0,0,0), (250, 10), (250, 370), 3)
+            pygame.draw.rect(self.screen, (self.grey), grid_rect, 3)
+            pygame.draw.line(self.screen, (self.grey), (10, 130), (370, 130), 3)
+            pygame.draw.line(self.screen, (self.grey), (10, 250), (370, 250), 3)
+            pygame.draw.line(self.screen, (self.grey), (130, 10), (130, 370), 3)
+            pygame.draw.line(self.screen, (self.grey), (250, 10), (250, 370), 3)
 
             for cell in self.cells:
                 cell.draw_border(self.screen)
