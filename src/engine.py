@@ -165,6 +165,7 @@ class Engine(object):
                     # Check Button clicked
                     if self.buttons["check"].is_touching(pos):
                         print('checking')
+                        self.game.grid.unselect_cell()
                         self.game.check_user_input()
 
                     # hint Button clicked

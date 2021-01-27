@@ -186,3 +186,7 @@ class Grid(object):
                 break
         # can't solve from here, resetting cell and exit function, passing to a previous function call
         cell.value = 0
+
+    def unselect_cell(self):
+        self.selected_cell.state["selected"] = False
+        self.selected_cell = None

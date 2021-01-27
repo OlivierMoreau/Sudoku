@@ -19,7 +19,6 @@ class Game(object):
 
     # Checks all user inputs and colors values
     def check_user_input(self):
-
         # flag for all user inputs
         all_valid = True
 
