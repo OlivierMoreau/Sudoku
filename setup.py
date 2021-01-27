@@ -16,4 +16,4 @@ config = {
     'name': 'projectname'
 }
 
-setup(**config)
+setup(**config, install_requires=['pygame'])

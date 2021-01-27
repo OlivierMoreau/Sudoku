@@ -1,6 +1,4 @@
-import math
 import pickle
-import random
 
 import pygame
 
@@ -8,7 +6,6 @@ from src.button import Button
 from src.checkbox import Checkbox
 from src.game import Game
 from src.icon import Icon
-from src.reader import Reader
 
 
 class Engine(object):
@@ -17,30 +14,46 @@ class Engine(object):
     def __init__(self, screen):
 
         self.screen = screen
+        self.background_color = (220, 220, 220)
 
         self.game = Game(screen)
         self.font = pygame.font.SysFont('arial', 16)
+
+        # flags
         self.run = False
+        self.won = False
+        self.victory_loading = False  # checks if victory state comes from loaded save
 
         self.counter = 0  # frames counter, resets every sec
         self.min = 0  # frames counter, resets every min
-        # Buttons
+
+        # Ui
         self.buttons = {
             "new_game": Button('./imgs/newgame_button.png', (390, 10), self.screen),
-            "solve": Button('./imgs/solve_button.png', (390, 110), self.screen),
-            "check": Button('./imgs/check_button.png', (390, 210), self.screen),
-            "hint": Button('./imgs/hint_button.png', (390, 310), self.screen)
+            "solve": Button('./imgs/solve_button.png', (390, 70), self.screen),
+            "check": Button('./imgs/check_button.png', (390, 140), self.screen),
+            "hint": Button('./imgs/hint_button.png', (390, 210), self.screen)
         }
         self.icons = {
-            "easy": Icon('./imgs/easy_icon.png', (580, 10), self.screen),
+            "easy": Icon('./imgs/easy_icon.png', (568, 5), self.screen),
+            "normal": Icon('./imgs/normal_icon.png', (568, 27), self.screen),
+            "hard": Icon('./imgs/hard_icon.png', (568, 49), self.screen),
+
         }
-        self.click_sound = pygame.mixer.Sound('./sounds/click.wav')
-        # Bottom text
-        self.bottom_rect = pygame.Rect((10, 375), (360, 125))
+
+        # sounds
+        self.click_sound = pygame.mixer.Sound('./sounds/metalClick.ogg')
+        self.valid_sound = pygame.mixer.Sound('./sounds/confirmation.ogg')
+        self.victory_sound = pygame.mixer.Sound('./sounds/victory.ogg')
+
+        # victory text
+        self.victory_img = pygame.image.load('./imgs/you_won.png').convert_alpha()
+        self.victory_rect = self.victory_img.get_rect(topleft=(390, 260))
+
         # Checkboxes
         self.boxes = []
         self.box_outline_color = (78, 137, 202)
-        self.box_check_color = (22, 200, 105)
+        self.box_check_color = (161, 205, 105)
         self.box_font_size = 16
         self.box_font_color = (0, 0, 0)
         self.box_text_offset = (28, 1)
@@ -63,28 +76,25 @@ class Engine(object):
     def start(self):
 
         # Creates and draw checkboxes
-        self.add_checkbox(self.screen, 550, 10, color=(230, 230, 230), caption="",
+        self.add_checkbox(self.screen, 550, 10, color=(230, 230, 230), caption="easy",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
 
-        self.add_checkbox(self.screen, 550, 30, color=(230, 230, 230), caption="",
+        self.add_checkbox(self.screen, 550, 30, color=(230, 230, 230), caption="normal",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
 
-        self.add_checkbox(self.screen, 550, 50, color=(230, 230, 230), caption="",
+        self.add_checkbox(self.screen, 550, 50, color=(230, 230, 230), caption="hard",
                           outline_color=self.box_outline_color, check_color=self.box_check_color,
                           font_size=self.box_font_size, font_color=self.box_font_color,
                           text_offset=self.box_text_offset, font=self.box_font)
 
-        for box in self.boxes:
-            box._draw_button_text()
-
-        # Draw buttons
+        # Draw buttons and icons
+        self.game.grid.draw()
         self.button_draw()
-
-
+        self.icon_draw()
 
         # Starts main loop
         self.run = True
@@ -100,9 +110,8 @@ class Engine(object):
 
     # Update screen
     def draw(self):
-        self.game.grid.draw()
-        self.button_draw()
-        self.icon_draw()
+
+        self.game.grid.draw_lines()
         for box in self.boxes:
             box.render_checkbox()
         pygame.display.update()
@@ -119,12 +128,10 @@ class Engine(object):
                     self.run = False
                     pygame.quit()
 
-
-
-                #hovering
-                #if self.button_test.isTouching(pos):
-                 #   print("touching")
-                    #self.button_test.image = pygame.transform.scale(self.button_test.image, (math.floor(self.button_test.image.get_width() * 1.1), math.floor(self.button_test.image.get_height() * 1.1)))
+                # hovering
+                # if self.button_test.isTouching(pos):
+                #   print("touching")
+                # self.button_test.image = pygame.transform.scale(self.button_test.image, (math.floor(self.button_test.image.get_width() * 1.1), math.floor(self.button_test.image.get_height() * 1.1)))
 
                 # Click events
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -138,12 +145,12 @@ class Engine(object):
                         if box.checked:
                             self.checked_box = box
 
-
                     # Solve Button clicked
                     if self.buttons["solve"].is_touching(pos):
                         print('solving')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.grid.solve_grid()
+                        pygame.mixer.Sound.play(self.valid_sound)
                         self.game.solved = True
 
                     # New game Button clicked
@@ -158,7 +165,6 @@ class Engine(object):
                     # Check Button clicked
                     if self.buttons["check"].is_touching(pos):
                         print('checking')
-                        pygame.mixer.Sound.play(self.click_sound)
                         self.game.check_user_input()
 
                     # hint Button clicked
@@ -173,19 +179,23 @@ class Engine(object):
                         if cell.state["selected"]:
                             cell.state["selected"] = False
                             cell.unselect(self.screen)
+                            cell.draw(self.screen)
                         if rect.collidepoint(pos):
                             print(
                                 f'selected cell coordinates = {cell.coordinates} cell orignial = {cell.state["original"]}')
                             print(f'selected cell current val = {cell.value} cell final_val = {cell.final_val}')
                             cell.state["selected"] = True
                             self.game.grid.selected_cell = cell
+                            cell.select(self.screen)
                             cell.draw(self.screen)
 
                 # Key press events
-                # Checks if no cell as ever been selected, if previous selected cell still is and if selected cell is one of the original inputs
-                if event.type == pygame.KEYDOWN and self.game.grid.selected_cell != None and \
-                        self.game.grid.selected_cell.state["selected"] and self.game.grid.selected_cell.state[
-                    "original"] != True and self.game.grid.selected_cell.state["hint"] != True:
+                # Checks if no cell as ever been selected, if previous selected cell still is and if
+                # selected cell is one of the original inputs
+                if event.type == pygame.KEYDOWN and self.game.grid.selected_cell is not None \
+                        and self.game.grid.selected_cell.state["selected"] \
+                        and self.game.grid.selected_cell.state["original"] != True \
+                        and self.game.grid.selected_cell.state["hint"] != True:
                     cell = self.game.grid.selected_cell
                     cell.state["user_input"] = True
                     if event.key == pygame.K_1 or event.key == pygame.K_KP1:
@@ -232,16 +242,19 @@ class Engine(object):
                         self.game.grid.selected_cell = None
             if self.checked_box:
                 self.checked_box.checked = True
-            self.draw()
 
             # Check for victory and local save once per sec
             if self.counter == 60:
-                if self.game.grid.check_grid() and self.game.solved == False:
-                    if self.game.final_check():
-                        self.end_message("you won !", (40, 122, 40), 40)
+                if self.game.grid.check_grid() and self.game.solved is False:  # Checks if the grid is full, and was not filled by the autosolver
+                    if not self.victory_loading and self.game.final_check():  # Checks if we've just loaded the complete game & if the answers are all correct
+                        if not self.won:  # only draws victory message once.
+                            self.end_message(self.victory_img, self.victory_rect)
+                            pygame.mixer.Sound.play(self.victory_sound)
+                        self.won = True
                         open('data/tempsave.data', 'w').close()
-                    else:
-                        self.end_message("There's an error somewhere !", (255, 153, 153), 28)
+                    # else:
+                    # error message
+
                 self.min += 1
                 self.counter = 0
 
@@ -250,27 +263,12 @@ class Engine(object):
                 self.save_state()
                 self.min = 0
 
+            self.draw()
+
     # Create new game
     def new_game(self, difficulty="normal"):
-        grid_pick = ""
-        print(f"new game : {difficulty}")
-
-        reader = Reader()
-        grids_sample = reader.size()
-        thirds = math.floor(grids_sample / 3)
-
-        # Grid selection sorted by the time they took to create
-        if difficulty == "easy":
-            grid_pick = random.randrange(thirds)
-        elif difficulty == "normal":
-            grid_pick = random.randrange(thirds, thirds * 2)
-        elif difficulty == "hard":
-            grid_pick = random.randrange(thirds * 2, thirds * 3 - 1)
-
-        # Each grid has 4 possible 90° rotations
-        rot_pick = random.randrange(4)
-
-        grid, full_grid = reader.grid_picker(grid_pick, rot_pick)
+        self.won = False
+        self.victory_loading = False
 
         # New game init
         self.game = Game(self.screen, difficulty)
@@ -279,18 +277,16 @@ class Engine(object):
         game.grid.set_vals()
 
         # Screen cleanup/redraw
-        bottom = pygame.Rect((0, 375), (500, 125))
-        pygame.draw.rect(self.screen, (255, 255, 255), bottom, 0)
+        self.screen.fill(self.background_color)
+        self.game.grid.draw()
+        self.button_draw()
+        self.icon_draw()
         self.draw()
         game.grid.set_vals()
 
-    # Display bottom message, t = text, c = color, s = fontsize
-    def end_message(self, t, c, s):
-        font = pygame.font.SysFont('arial', s)
-        pygame.draw.rect(self.screen, (255, 255, 255), self.bottom_rect, 0)
-        text = font.render(t, True, c)
-        rect = text.get_rect(center=self.bottom_rect.center)
-        self.screen.blit(text, rect)
+    # Display end message
+    def end_message(self, img, rect):
+        self.screen.blit(img, rect)
         pygame.display.update()
 
     def save_state(self):
@@ -301,6 +297,7 @@ class Engine(object):
                 save.append(cell.save_state())
             save.append(self.game.grid.grid)
             save.append(self.game.grid.full_grid)
+            save.append(self.game.solved)
             pickle.dump(save, f)
 
     def load_state(self):
@@ -313,6 +310,7 @@ class Engine(object):
         print(saved_state[81])
         self.game.grid.grid = saved_state[81]
         self.game.grid.full_grid = saved_state[82]
+        self.game.solved = saved_state[83]
 
         for x in range(81):
             cell = self.game.grid.cells[x]
@@ -324,3 +322,8 @@ class Engine(object):
             cell.rectangle = saved_state[x][5]
             cell.clean(self.screen)
             cell.draw(self.screen)
+
+        # Stops victory sound and text from loaded save
+        if self.game.grid.check_grid() and self.game.solved is False:
+            if self.game.final_check():
+                self.victory_loading = True

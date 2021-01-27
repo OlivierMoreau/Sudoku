@@ -5,19 +5,15 @@ import pygame
 from src.engine import Engine
 
 
-
 def main():
-
     pygame.init()
     pygame.mixer.init()
     pygame.display.set_caption("Sudoku")
-    size = (800, 500)
+    size = (650, 380)
     screen = pygame.display.set_mode(size)
-    screen.fill((255,255,255))
+    screen.fill((220, 220, 220))
     icon = pygame.image.load('graphics/icone.png')
     pygame.display.set_icon(icon)
-
-
 
     # Checks if there's a saved file and creates an empty one if not
     if not os.path.isfile("data/tempsave.data"):
@@ -31,10 +27,9 @@ def main():
 
     else:
         print("no save file")
-
         engine = Engine(screen)
         engine.start()
-
+        engine.new_game()
 
 
 if __name__ == '__main__':
