@@ -167,7 +167,7 @@ class Grid(object):
             row, col, square = cell.parents.values()
 
             if cell.value == 0:
-                cell.state["solved"] = True # Flags the cell as autosolved
+                cell.state["solved"] = True  # Flags the cell as autosolved
                 for val in range(1, 10):
                     if row.check_valid(val) and col.check_valid(val) and square.check_valid(val):
                         cell.clean(self.screen)
@@ -188,5 +188,6 @@ class Grid(object):
         cell.value = 0
 
     def unselect_cell(self):
-        self.selected_cell.state["selected"] = False
-        self.selected_cell = None
+        if self.selected_cell:
+            self.selected_cell.state["selected"] = False
+            self.selected_cell = None
