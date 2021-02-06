@@ -13,8 +13,6 @@ def forfor(a):
 
 
 def pick_grid(difficulty):
-    print(f"picking grids in difficulty {difficulty}")
-
     reader = Reader()
     grids_sample = reader.size()
     thirds = math.floor(grids_sample / 3)
@@ -173,7 +171,6 @@ class Grid(object):
                         cell.draw(self.screen)
                         # check if grid is full, exit if true
                         if self.check_grid():
-                            print("grid full")
                             return True
                         # if not calls itself, and performs the same operations, once function calls come back to this function, try the next value
                         else:

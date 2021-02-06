@@ -52,8 +52,7 @@ class Checkbox:
         rect = self.checkbox_obj
         if rect.collidepoint(pos):
             self.checked = True
-
-            print(str(self.caption) + ' toggle ' + str(self.checked))
+            self.checked = True
 
     def update_checkbox(self, event_object):
         if event_object.type == pygame.MOUSEBUTTONDOWN:
