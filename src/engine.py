@@ -128,14 +128,8 @@ class Engine(object):
                     self.run = False
                     pygame.quit()
 
-                # hovering
-                # if self.button_test.isTouching(pos):
-                #   print("touching")
-                # self.button_test.image = pygame.transform.scale(self.button_test.image, (math.floor(self.button_test.image.get_width() * 1.1), math.floor(self.button_test.image.get_height() * 1.1)))
-
                 # Click events
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    print('clicking')
 
                     # check box
                     for box in self.boxes:
@@ -147,7 +141,6 @@ class Engine(object):
 
                     # Solve Button clicked
                     if self.buttons["solve"].is_touching(pos):
-                        print('solving')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.grid.solve_grid()
                         pygame.mixer.Sound.play(self.valid_sound)
@@ -164,13 +157,11 @@ class Engine(object):
 
                     # Check Button clicked
                     if self.buttons["check"].is_touching(pos):
-                        print('checking')
                         self.game.grid.unselect_cell()
                         self.game.check_user_input()
 
                     # hint Button clicked
                     if self.buttons["hint"].is_touching(pos) and self.game.grid.check_grid() == False:
-                        print('hinting')
                         pygame.mixer.Sound.play(self.click_sound)
                         self.game.give_hint(self.screen)
 
@@ -182,9 +173,6 @@ class Engine(object):
                             cell.unselect(self.screen)
                             cell.draw(self.screen)
                         if rect.collidepoint(pos):
-                            print(
-                                f'selected cell coordinates = {cell.coordinates} cell orignial = {cell.state["original"]}')
-                            print(f'selected cell current val = {cell.value} cell final_val = {cell.final_val}')
                             cell.state["selected"] = True
                             self.game.grid.selected_cell = cell
                             cell.select(self.screen)
@@ -291,7 +279,6 @@ class Engine(object):
         pygame.display.update()
 
     def save_state(self):
-        print("saving")
         with open('data/tempsave.data', 'wb') as f:
             save = []
             for cell in self.game.grid.cells:
@@ -302,13 +289,10 @@ class Engine(object):
             pickle.dump(save, f)
 
     def load_state(self):
-        print("loading save")
-
         saved_state = ""
         with open("data/tempsave.data", "rb") as f:
             saved_state = pickle.load(f)
 
-        print(saved_state[81])
         self.game.grid.grid = saved_state[81]
         self.game.grid.full_grid = saved_state[82]
         self.game.solved = saved_state[83]

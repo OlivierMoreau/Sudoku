@@ -1,5 +1,6 @@
 import pickle
 
+
 class Reader():
 
     def __init__(self):
@@ -8,7 +9,6 @@ class Reader():
 
     def grid_picker(self, g, r):
         'pick a grid from the file, g = the grid, r = one of 4 90° rotations'
-
 
         grid_ret = self.content[g][0][r]
         full_grid_ret = self.content[g][1][r]

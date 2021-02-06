@@ -2,18 +2,18 @@ import pygame
 
 
 class Cell(object):
-    '''Individual cells of the grid'''
+    """Individual cells of the grid"""
 
     def __init__(self):
         self.coordinates = (0, 0)
         self.size = (40, 40)
         self.rectangle = ""
+        self.font = pygame.font.SysFont('arial', 20)
 
         self.emptycell = pygame.Surface((38, 38))
         self.emptycell.fill((255, 255, 255))
 
         self.parents = {'row': '', 'collumn': '', 'square': ''}
-        self.font = pygame.font.SysFont('arial', 20)
 
         # Current and correct values
         self.value = 0

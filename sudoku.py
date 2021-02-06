@@ -4,7 +4,6 @@ import pygame
 
 from src.engine import Engine
 
-
 def main():
     pygame.init()
     pygame.mixer.init()
@@ -17,7 +16,6 @@ def main():
 
     # Checks if there's a saved file and creates an empty one if not
     if not os.path.isfile("data/tempsave.data"):
-        print()
         open("data/tempsave.data", "w+")
 
     # load from save or starts from scratch
@@ -25,9 +23,7 @@ def main():
         engine = Engine(screen)
         engine.load_state()
         engine.start()
-
     else:
-        print("no save file")
         engine = Engine(screen)
         engine.start()
         engine.new_game()

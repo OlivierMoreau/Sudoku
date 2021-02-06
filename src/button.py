@@ -13,6 +13,7 @@ class Button:
     def draw(self):
         self.screen.blit(self.image, self.rect)
 
+    # Check if the position provided as argument is in the mask or not
     def is_touching(self, pos):
         pos_in_mask = pos[0] - self.rect.x, pos[1] - self.rect.y
         touching = self.rect.collidepoint(pos) and self.mask.get_at(pos_in_mask)

@@ -1,8 +1,12 @@
 import pygame
+
 pygame.init()
 
+
 class Checkbox:
-    def __init__(self, surface, x, y, idnum, color=(230, 230, 230), caption="",outline_color=(0, 0, 0),check_color=(0, 0, 0), font_size=22, font_color=(0, 0, 0),text_offset=(28, 1), font='Ariel Black', size=12):
+    def __init__(self, surface, x, y, idnum, color=(230, 230, 230), caption="", outline_color=(0, 0, 0),
+                 check_color=(0, 0, 0), font_size=22, font_color=(0, 0, 0), text_offset=(28, 1), font='Ariel Black',
+                 size=12):
         self.surface = surface
         self.x = x
         self.y = y
@@ -15,7 +19,7 @@ class Checkbox:
         self.to = text_offset
         self.ft = font
         self.size = size
-        #identification for removal and reorginazation
+        # identification for removal and reorginazation
         self.idnum = idnum
 
         # checkbox object
@@ -30,19 +34,18 @@ class Checkbox:
         self.font_surf = self.font.render(self.caption, True, self.fc)
         w, h = self.font.size(self.caption)
         self.font_pos = (self.x + self.to[0], self.y + self.size / 2 - h / 2 +
-        self.to[1])
+                         self.to[1])
         self.surface.blit(self.font_surf, self.font_pos)
 
     def render_checkbox(self):
         if self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)
             pygame.draw.rect(self.surface, self.oc, self.checkbox_outline, 1)
-            pygame.draw.circle(self.surface, self.cc, (self.x + self.size // 2 , self.y + self.size // 2 ), 4)
+            pygame.draw.circle(self.surface, self.cc, (self.x + self.size // 2, self.y + self.size // 2), 4)
 
         elif not self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)
             pygame.draw.rect(self.surface, self.oc, self.checkbox_outline, 1)
-
 
     def _update(self, event_object):
         pos = pygame.mouse.get_pos()
@@ -50,7 +53,7 @@ class Checkbox:
         if rect.collidepoint(pos):
             self.checked = True
 
-            print(str(self.caption)+' toggle '+str(self.checked))
+            print(str(self.caption) + ' toggle ' + str(self.checked))
 
     def update_checkbox(self, event_object):
         if event_object.type == pygame.MOUSEBUTTONDOWN:

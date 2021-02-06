@@ -48,7 +48,6 @@ class Game(object):
     def give_hint(self, screen):
         looping = True
         while looping:
-            print("looking for a cell")
             cell = random.choice(self.grid.cells)
             if cell.value == 0 and cell.state["original"] is False:
                 cell.value = cell.final_val
