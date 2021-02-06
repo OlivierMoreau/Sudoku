@@ -17,6 +17,7 @@ def main():
 
     # Checks if there's a saved file and creates an empty one if not
     if not os.path.isfile("data/tempsave.data"):
+        print()
         open("data/tempsave.data", "w+")
 
     # load from save or starts from scratch
