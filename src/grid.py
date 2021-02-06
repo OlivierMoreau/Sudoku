@@ -2,7 +2,7 @@ import random
 import math
 import pygame
 
-from src.blocks import Row, Collumn, Square
+from src.blocks import Row, Column, Square
 from src.cell import Cell
 from src.reader import Reader
 
@@ -63,23 +63,23 @@ class Grid(object):
         for x in range(81):
             self.cells.append(Cell())
 
-        # fills rows and collumns with cells
+        # fills rows and columns with cells
         for x in range(9):
             row = Row()
-            collumn = Collumn()
+            column = Column()
 
             for y in range(9):
                 row.cells.append(self.cells[x + ((y) * 9)])
-                self.cells[x + ((y) * 9)].parents['collumn'] = row
-                collumn.cells.append(self.cells[y + ((x) * 9)])
-                self.cells[y + ((x) * 9)].parents['row'] = collumn
+                self.cells[x + ((y) * 9)].parents['column'] = row
+                column.cells.append(self.cells[y + ((x) * 9)])
+                self.cells[y + ((x) * 9)].parents['row'] = column
 
-            self.rows.append(collumn)
+            self.rows.append(column)
             self.columns.append(row)
 
         # fills squares with cells
         for z in range(3):
-            col = z * 3  # horizontal offset for the collumn
+            col = z * 3  # horizontal offset for the column
             for x in range(0, 9, 3):  # vertical offset for the rows
                 square = Square()
                 for y in range(3):
@@ -116,21 +116,18 @@ class Grid(object):
         # Add a clue if a block is empty
         for square in self.squares:
             if sum(square.get_values()) == 0:
-                print("adding in square")
                 cell = square.cells[random.randrange(1, 9)]
                 cell.value = cell.final_val
                 cell.state["original"] = True
                 cell.draw(self.screen)
         for row in self.rows:
             if sum(row.get_values()) == 0:
-                print("adding in row")
                 cell = row.cells[random.randrange(1, 9)]
                 cell.value = cell.final_val
                 cell.state["original"] = True
                 cell.draw(self.screen)
         for col in self.columns:
             if sum(col.get_values()) == 0:
-                print("adding in col")
                 cell = col.cells[random.randrange(1, 9)]
                 cell.value = cell.final_val
                 cell.state["original"] = True

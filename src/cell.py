@@ -13,7 +13,7 @@ class Cell(object):
         self.emptycell = pygame.Surface((38, 38))
         self.emptycell.fill((255, 255, 255))
 
-        self.parents = {'row': '', 'collumn': '', 'square': ''}
+        self.parents = {'row': '', 'column': '', 'square': ''}
 
         # Current and correct values
         self.value = 0
